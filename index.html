@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<title>Ganpati Bappa Morya — The 30-Day Mandal</title>
+<link rel="stylesheet" href="css/style.css?v=2">
+</head>
+<body>
+<div id="game">
+  <canvas id="scene"></canvas>
+
+  <!-- ============ HUD ============ -->
+  <div id="hud" class="hidden">
+    <div class="hud-left">
+      <div class="hud-chip day-chip"><span class="hud-ico">🗓️</span><div><div class="hud-label">Day</div><div class="hud-val" id="hudDay">1 / 30</div></div></div>
+      <div class="hud-chip phase-chip"><span class="hud-ico" id="hudPhaseIco">🪙</span><div><div class="hud-label">Phase</div><div class="hud-val" id="hudPhase">Chanda</div></div></div>
+    </div>
+    <div class="hud-right">
+      <div class="hud-chip money"><span class="hud-ico">💰</span><div class="hud-val" id="hudMoney">₹5,000</div></div>
+      <div class="hud-chip rep"><span class="hud-ico">🙏</span><div class="hud-val" id="hudRep">20</div><div class="hud-label">Reputation</div></div>
+      <div class="hud-chip vol"><span class="hud-ico">👥</span><div class="hud-val" id="hudVol">2</div><div class="hud-label">Volunteers</div></div>
+      <div class="hud-chip sat" id="hudSatChip"><span class="hud-ico">😊</span><div class="hud-val" id="hudSat">70</div><div class="hud-label">Crowd Joy</div></div>
+      <button id="btnSound" class="icon-btn" title="Toggle sound">🔊</button>
+    </div>
+  </div>
+
+  <!-- ============ Overlays / panels ============ -->
+  <div id="panel" class="hidden"></div>       <!-- full-screen phase UIs (planning, scorecard...) -->
+  <div id="dialogBox" class="hidden"></div>    <!-- modal dialog (donation talks, haggling, events) -->
+  <div id="toasts"></div>
+
+  <!-- interaction prompt -->
+  <div id="prompt" class="hidden"><kbd>E</kbd> <span id="promptText">Talk</span></div>
+
+  <!-- phase banner (big center announcement) -->
+  <div id="banner" class="hidden"><div id="bannerSub"></div><div id="bannerMain"></div></div>
+
+  <!-- mobile controls -->
+  <div id="touchControls" class="hidden">
+    <div id="joyBase"><div id="joyStick"></div></div>
+    <button id="btnAction">🙏</button>
+  </div>
+</div>
+
+<script>
+// visible error overlay — never fail silently to a dark screen
+window.__showErr=function(msg){
+  var d=document.getElementById('errOverlay');
+  if(!d){d=document.createElement('div');d.id='errOverlay';
+    d.style.cssText='position:fixed;left:10px;right:10px;bottom:10px;z-index:9999;background:#7f1d1d;color:#fee2e2;font:12px/1.5 monospace;padding:10px 14px;border-radius:10px;border:2px solid #dc2626;max-height:40vh;overflow:auto;white-space:pre-wrap';
+    document.body.appendChild(d);}
+  d.textContent+='⚠ '+msg+'\n';
+};
+window.addEventListener('error',function(ev){
+  window.__showErr((ev.message||'Error')+' @ '+(ev.filename||'').split('/').pop()+':'+(ev.lineno||0));
+});
+</script>
+<script src="js/util.js?v=2"></script>
+<script src="js/art.js?v=2"></script>
+<script src="js/state.js?v=2"></script>
+<script src="js/phase1.js?v=2"></script>
+<script src="js/phase2.js?v=2"></script>
+<script src="js/phase3.js?v=2"></script>
+<script src="js/phase4.js?v=2"></script>
+<script src="js/phase5.js?v=2"></script>
+<script src="js/phase6.js?v=2"></script>
+<script src="js/main.js?v=2"></script>
+<script>
+// boot check: if the game never rendered its title screen, say so loudly
+setTimeout(function(){
+  var p=document.getElementById('panel');
+  if(p && p.innerHTML===''){
+    var d=document.createElement('div');
+    d.style.cssText='position:fixed;inset:0;display:flex;align-items:center;justify-content:center;z-index:99999;background:#120c22;color:#ffe9c9;font:16px system-ui;text-align:center;padding:20px';
+    d.innerHTML='⚠️ Game scripts failed to load.<br>Please reload the preview.';
+    document.body.appendChild(d);
+  } else if(!window.__frames){
+    window.__showErr('Render loop never started (stale cache?). HARD RELOAD: Ctrl+Shift+R / Cmd+Shift+R');
+  }
+},3500);
+</script>
+</body>
+</html>
