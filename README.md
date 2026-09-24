@@ -18,6 +18,14 @@ Guide your mandal through the full **30-day countdown** across six phases:
 Then get graded on **Budget · Creativity · Reputation · Visitor Satisfaction**, with an
 eco-friendly bonus multiplier (clay idol, natural colors, immersion tank).
 
+## Round 2 engagement upgrades
+
+- 🌺 **Daily Sankalp challenges** — rotating goals with score bonuses make each run feel different.
+- 🏆 **Leaderboard system** — persistent top scores on the device, plus an optional Vercel/GitHub-backed community board.
+- 📈 **Mandal Journey** — run count, streak, personal bests by difficulty, unlocked achievement badges and a score history.
+- 📤 **Shareable scorecard** — save a mandal name, submit a score, and share the result with friends.
+- 🔄 **Replay loop** — four challenge archetypes, two difficulties and six unlockable achievements encourage multiple runs.
+
 ## Features
 
 - Two difficulties: 🏘️ *Galli Mandal* (alley) and 🏙️ *Raja Mandal* (city-level)

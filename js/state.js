@@ -4,6 +4,7 @@
 /* ---------- global game state ---------- */
 const G={
   day:1, maxDay:30, difficulty:'galli', // galli | raja
+  challenge:null, runRecorded:false,
   money:0, reputation:20, volunteers:2,
   satisfaction:70,
   phase:'title',
@@ -291,8 +292,8 @@ const PHASE_DAYS={
   donation:[1,6], planning:[7,12], construction:[13,18],
   agaman:[19,19], utsav:[20,29], visarjan:[30,30]
 };
-function startGame(diff){
-  Object.assign(G,{day:1,difficulty:diff,money:DIFF[diff].money,reputation:20,volunteers:2,
+function startGame(diff,challengeId){
+  Object.assign(G,{day:1,difficulty:diff,challenge:challengeById(challengeId||dailyChallenge().id),runRecorded:false,money:DIFF[diff].money,reputation:20,volunteers:2,
     satisfaction:70,phase:'donation',weather:'clear',chandaCollected:0,
     alloc:{infra:0,idol:0,decor:0,sound:0,security:0},purchases:{},
     contractors:{structure:0,electric:0,paint:0,soundEng:0},

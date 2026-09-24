@@ -8,6 +8,8 @@ PHASES.title={
     this.t=0;
     $('#hud').classList.add('hidden');
     const p=$('#panel');p.classList.remove('hidden');
+    const daily=dailyChallenge();
+    const profile=loadEngagement();
     p.innerHTML=`
     <div class="sheet" style="text-align:center;max-width:820px">
       <div style="font-size:3rem;line-height:1">🐘</div>
@@ -17,6 +19,19 @@ PHASES.title={
         Lead your neighborhood mandal through <b>30 days</b>: collect chanda door-to-door, haggle in wholesale markets,
         build the pandal, bring Bappa home in a grand procession, run 10 days of festival chaos — and give Him a
         flawless, eco-friendly visarjan. You are graded on <b>Budget · Creativity · Reputation · Visitor Satisfaction</b>.
+      </div>
+      <div class="round2-grid">
+        <div class="challenge-card">
+          <div class="challenge-kicker">🌺 TODAY'S SANKALP · +${daily.bonus} BONUS</div>
+          <div class="challenge-name">${daily.icon} ${daily.name}</div>
+          <div class="desc">${daily.desc}</div>
+          <div class="challenge-note">Complete it during your run to boost your final score.</div>
+        </div>
+        <div class="progress-card">
+          <div class="challenge-kicker">🏆 YOUR MANDAL JOURNEY</div>
+          <div class="journey-stats"><b>${profile.runs||0}</b><span>runs</span><b>${profile.streak||0}</b><span>day streak</span><b>${profile.bestByDifficulty.galli||0}</b><span>best score</span></div>
+          <button class="btn ghost" id="btnTitleBoard">📊 View Leaderboard</button>
+        </div>
       </div>
       <div class="grid-cards" style="grid-template-columns:1fr 1fr;max-width:640px;margin:0 auto">
         ${Object.keys(DIFF).map(k=>{const d=DIFF[k];return `
@@ -34,8 +49,14 @@ PHASES.title={
       Audio_.init();sfx('bell');
       p.classList.add('hidden');
       $('#hud').classList.remove('hidden');
-      startGame(c.dataset.d);
+      startGame(c.dataset.d,daily.id);
     });
+    const boardBtn=p.querySelector('#btnTitleBoard');
+    if(boardBtn)boardBtn.onclick=()=>{
+      p.innerHTML=`<div class="sheet" style="max-width:760px"><div class="row spread"><div><div class="title-sub">ROUND 2 SCOREBOARD</div><h2>🏆 Mandal Leaderboard</h2></div><button class="btn ghost" id="btnBoardBack">← Back</button></div><div id="titleBoards">${localLeaderboardHtml()}</div></div>`;
+      renderLeaderboards('titleBoards');
+      p.querySelector('#btnBoardBack').onclick=()=>PHASES.title.enter();
+    };
   },
   exit(){},
   update(dt){this.t+=dt;Particles.update(dt);

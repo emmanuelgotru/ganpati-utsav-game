@@ -226,21 +226,33 @@ function enter(){
   $('#panel').classList.remove('hidden');
   const s=computeScores();G.scores=s;
   const mult=ecoMultiplier();
-  const total=Math.round((s.budget+s.creativity+s.reputation+s.satisfaction)/4*mult);
+  const challenge=challengeResult(G.challenge);
+  const baseTotal=Math.round((s.budget+s.creativity+s.reputation+s.satisfaction)/4*mult);
+  const total=clamp(baseTotal+challenge.bonus,0,100);
   const gr=gradeOf(total);
   const logs=G.festival.dayLogs;
   const bestDay=logs.length?logs.reduce((a,b)=>a.sat>b.sat?a:b):{day:G.day,sat:0,turnout:0};
   const totalVisitors=logs.reduce((a,l)=>a+l.turnout,0);
+  const run={total,grade:gr.g,difficulty:G.difficulty,challengeName:challenge.name,challengeComplete:challenge.complete,
+    satisfaction:G.festival.avgSat,ecoAll:G.eco.clay&&G.eco.naturalColors&&G.eco.tank,eventsSolved:G.stats.eventsSolved,eventsFailed:G.stats.eventsFailed};
+  G.lastRun=run;G.challengeResult=challenge;
+  let saved={profile:loadEngagement(),record:null,unlocked:[]};
+  if(!G.runRecorded){saved=recordRun(run);G.runRecorded=true;G.runRecordId=saved.record.id;G.newAchievements=saved.unlocked;}
+  const profile=loadEngagement();
+  const unlocked=saved.unlocked||G.newAchievements||[];
+  const unlockedNames=achievementCatalog().filter(a=>profile.achievements.includes(a.id));
   const p=$('#panel');
   p.innerHTML=`<div class="sheet" style="text-align:center">
     <div class="score-grade">${gr.g}</div>
     <h2 style="justify-content:center">${gr.title}</h2>
     <div class="sub">${gr.msg}</div>
     <div style="font-size:2.2rem;font-weight:900;color:#7c2d12">Score ${total}/100 ${mult>1?`<span style="font-size:1rem;color:#16a34a">(×${mult.toFixed(2)} eco bonus!)</span>`:''}</div>
+    <div class="score-challenge ${challenge.complete?'done':''}"><span style="font-size:1.8rem">${challenge.icon}</span><div class="challenge-copy"><strong>${challenge.complete?'Sankalp complete!':'Daily Sankalp' } · ${challenge.name}</strong><br>${challenge.desc}</div><span class="challenge-bonus">${challenge.complete?'+'+challenge.bonus:'0'} pts</span></div>
     <div style="max-width:520px;margin:18px auto;text-align:left">
       ${[['💰 Budget Efficiency',s.budget,'green'],['🎨 Creativity',s.creativity,''],['🙏 Neighborhood Reputation',s.reputation,'blue'],['😊 Visitor Satisfaction',s.satisfaction,'']].map(([l,v,c])=>`
       <div class="stat-line"><span class="s-label">${l}</span><div class="bar"><div class="bar-fill ${c}" style="width:0%" data-w="${v}"></div></div><b style="min-width:34px;text-align:right">${v}</b></div>`).join('')}
     </div>
+    <div class="achievement-strip">${unlockedNames.map(a=>`<div class="achievement-chip ${unlocked.includes(a.id)?'new':''}">${a.icon} ${a.name}<small>${a.desc}</small></div>`).join('')||'<div class="sub">Complete special goals to unlock mandal badges.</div>'}</div>
     <div class="grid-cards" style="max-width:640px;margin:0 auto;text-align:left">
       <div class="card"><h3>📊 Festival Record</h3><div class="desc">
         Chanda collected: <b>${fmt(G.chandaCollected)}</b> · Treasury left: <b>${fmt(G.money)}</b><br>
@@ -251,13 +263,25 @@ function enter(){
         Eco choices: ${G.eco.clay?'🌱Clay ':''}${G.eco.naturalColors?'🎨Natural ':''}${G.eco.tank?'🌊Tank ':''}${!G.eco.clay&&!G.eco.tank?'🏭 None — the river weeps':''}
       </div></div>
     </div>
+    <div class="score-actions"><label for="playerName">Put your name on the scoreboard</label><div class="row center"><input id="playerName" maxlength="22" value="${safeText(profile.name||'Mandal Chief')}" placeholder="Mandal name or your name"><button class="btn" id="btnSaveScore">💾 Save Score</button><button class="btn ghost share-btn" id="btnShare">📤 Share</button></div><div id="saveStatus" class="save-status">Saved on this device. Submit to join the community board.</div></div>
+    <div class="leaderboards" id="scoreBoards"></div>
     <div class="row center mt"><button class="btn big" id="btnReplay">🔄 Play Again</button>
     <button class="btn ghost big" id="btnWatch">🎆 Watch one last firework show</button></div>
   </div>`;
   setTimeout(()=>p.querySelectorAll('.bar-fill').forEach(b=>b.style.width=b.dataset.w+'%'),200);
+  renderLeaderboards('scoreBoards');
   $('#btnReplay').onclick=()=>{p.classList.add('hidden');setPhase('title');};
   $('#btnWatch').onclick=()=>{sfx('firework');Particles.confetti(innerWidth/2,innerHeight*.4,60);
     for(let i=0;i<6;i++)setTimeout(()=>sfx('firework'),i*350);};
+  $('#btnShare').onclick=async()=>{const ok=await shareRun(run);if(!ok)toast('Share is not available here — copy your score manually!','bad');};
+  $('#btnSaveScore').onclick=async()=>{
+    const name=$('#playerName').value.trim()||'Mandal Chief';renameLocalRecord(G.runRecordId,name);
+    const status=$('#saveStatus');status.className='save-status pending';status.textContent='Submitting to the community board…';
+    const result=await submitCommunityScore(run,name);
+    if(result.ok){status.className='save-status';status.textContent='✅ Score saved locally and on the community board!';}
+    else{status.className='save-status';status.textContent='✅ Saved locally. Community sync will be available on the deployed link.';}
+    renderLeaderboards('scoreBoards');
+  };
   sfx('good');
 }
 function exit(){}
