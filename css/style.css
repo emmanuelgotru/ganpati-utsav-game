@@ -181,4 +181,10 @@ kbd{background:#3b2f23;color:#ffe9c9;border-radius:5px;padding:1px 7px;font-weig
   .hud-val{font-size:.85rem}
   #hud{padding:6px 8px}
   .sheet{padding:14px}
+  .grid-cards{grid-template-columns:1fr !important}
+  .round2-grid,.leaderboards{grid-template-columns:1fr}
+  .score-actions .row{align-items:stretch}
+  .score-actions input{width:100%}
+  .score-actions .btn{flex:1}
+  .leader-row{grid-template-columns:28px minmax(0,1fr) auto 34px}
 }
